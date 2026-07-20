@@ -30,6 +30,7 @@ class Product(models.Model):
     imageUrl = models.CharField(max_length=1000, blank=True, null=True)
     main_images = models.JSONField(default=list, blank=True)
     extra_images = models.JSONField(default=list, blank=True)
+    status = models.CharField(max_length=20, default='pending')
     
     # other fields they might have sent in the body
     description = models.TextField(blank=True, null=True)
