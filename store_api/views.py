@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.authtoken.models import Token
+from django.db.models import Q
 from .models import User, Category, Product, ProductView, Order, Chat
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer,
@@ -111,18 +112,15 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 # Product ViewSet
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all().order_by('-createdAt')
     serializer_class = ProductSerializer
 
     def get_queryset(self):
         user = self.request.user
-        if user and user.is_staff:
-            return Product.objects.all().order_by('-createdAt')
-        # If authenticated, user sees approved + their own pending/rejected
-        if user and user.is_authenticated:
-            from django.db.models import Q
-            return Product.objects.filter(Q(status='approved') | Q(seller=user)).order_by('-createdAt')
-        return Product.objects.filter(status='approved').order_by('-createdAt')
+        if user.is_staff:
+            return Product.objects.all()
+        if user.is_authenticated:
+            return Product.objects.filter(Q(status='approved') | Q(seller=user))
+        return Product.objects.filter(status='approved')
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -143,20 +141,6 @@ class ProductViewSet(viewsets.ModelViewSet):
         if request.user.id != product.seller.id and not request.user.is_staff:
             return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
-
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
-    def approve(self, request, pk=None):
-        product = self.get_object()
-        product.status = 'approved'
-        product.save()
-        return Response({"status": "approved"})
-
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
-    def reject(self, request, pk=None):
-        product = self.get_object()
-        product.status = 'rejected'
-        product.save()
-        return Response({"status": "rejected"})
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
     def upload(self, request):
