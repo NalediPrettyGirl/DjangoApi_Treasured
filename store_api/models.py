@@ -33,6 +33,18 @@ class Product(models.Model):
     
     # other fields they might have sent in the body
     description = models.TextField(blank=True, null=True)
+    
+    # Missing fields from the frontend list-attire form
+    contact_email = models.CharField(max_length=255, blank=True, null=True)
+    phone_number = models.CharField(max_length=50, blank=True, null=True)
+    province = models.CharField(max_length=100, blank=True, null=True)
+    size = models.CharField(max_length=50, blank=True, null=True)
+    style = models.JSONField(default=list, blank=True)
+    color = models.CharField(max_length=100, blank=True, null=True)
+    designer = models.CharField(max_length=255, blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    condition = models.CharField(max_length=50, blank=True, null=True)
+
     STATUS_CHOICES = (
         ('pending', 'Pending'),
         ('approved', 'Approved'),
