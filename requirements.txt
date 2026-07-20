@@ -8,3 +8,4 @@ tzdata==2026.3
 gunicorn
 dj-database-url
 whitenoise
+cloudinary
