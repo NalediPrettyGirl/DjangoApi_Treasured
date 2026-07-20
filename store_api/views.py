@@ -134,24 +134,49 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
-    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
     def upload(self, request):
-        from django.core.files.storage import FileSystemStorage
-        from django.conf import settings
-        fs = FileSystemStorage(location=settings.MEDIA_ROOT, base_url=settings.MEDIA_URL)
+        import cloudinary
+        import cloudinary.uploader
+        
+        # Configure Cloudinary (in production, use environment variables)
+        cloudinary.config( 
+          cloud_name = "finttein", 
+          api_key = "837699919773594", 
+          api_secret = "vqU32ikakYbmhKTCTVSlrgENyTM" 
+        )
         
         main_images = request.FILES.getlist('main_images')
         extra_images = request.FILES.getlist('extra_images')
         
         uploaded_main = []
         for f in main_images:
-            filename = fs.save(f.name, f)
-            uploaded_main.append(fs.url(filename))
+            try:
+                upload_result = cloudinary.uploader.upload(f)
+                # Generate optimized URL using f_auto,q_auto
+                optimized_url, _ = cloudinary.utils.cloudinary_url(
+                    upload_result.get('public_id'),
+                    fetch_format="auto",
+                    quality="auto",
+                    secure=True
+                )
+                uploaded_main.append(optimized_url)
+            except Exception as e:
+                return Response({'error': str(e)}, status=400)
             
         uploaded_extra = []
         for f in extra_images:
-            filename = fs.save(f.name, f)
-            uploaded_extra.append(fs.url(filename))
+            try:
+                upload_result = cloudinary.uploader.upload(f)
+                optimized_url, _ = cloudinary.utils.cloudinary_url(
+                    upload_result.get('public_id'),
+                    fetch_format="auto",
+                    quality="auto",
+                    secure=True
+                )
+                uploaded_extra.append(optimized_url)
+            except Exception as e:
+                return Response({'error': str(e)}, status=400)
             
         return Response({
             'main_images': uploaded_main,
