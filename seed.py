@@ -9,13 +9,15 @@ from store_api.models import User, Category, Product
 # Clear existing products to avoid duplicates
 Product.objects.all().delete()
 
-# Ensure we have our test user
-user, _ = User.objects.get_or_create(username="testuser", email="test@example.com")
-if _:
-    user.set_password("password123")
-    user.is_staff = True
-    user.is_superuser = True
-    user.save()
+# Ensure we have our test user (Busi)
+user, _ = User.objects.get_or_create(username="bus1s1w3", email="makhubedubusi@gmail.com")
+user.first_name = "Busi"
+user.last_name = "Makhubedu"
+user.whatsapp = "+27643619533"
+user.set_password("bus1s1w3")
+user.is_staff = True
+user.is_superuser = True
+user.save()
 
 # Create products with real images from your frontend folder
 products_data = [
