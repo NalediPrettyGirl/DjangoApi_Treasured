@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     register_user, login_user, create_checkout, UserViewSet,
-    CategoryViewSet, ProductViewSet, OrderViewSet, ChatViewSet
+    CategoryViewSet, ProductViewSet, OrderViewSet, ChatViewSet,
+    contact_message
 )
 
 router = DefaultRouter(trailing_slash=False)
@@ -16,6 +17,7 @@ urlpatterns = [
     path('users/register', register_user, name='register'),
     path('users/login', login_user, name='login'),
     path('checkout/create', create_checkout, name='create_checkout'),
+    path('contact', contact_message, name='contact'),
     # ViewSets
     path('', include(router.urls)),
 ]

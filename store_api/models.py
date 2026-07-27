@@ -44,6 +44,7 @@ class Product(models.Model):
     designer = models.CharField(max_length=255, blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
     condition = models.CharField(max_length=50, blank=True, null=True)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     STATUS_CHOICES = (
         ('pending', 'Pending'),

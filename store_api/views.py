@@ -220,3 +220,32 @@ class ChatViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         return [permissions.IsAuthenticated()]
+
+
+from django.core.mail import send_mail
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def contact_message(request):
+    first_name = request.data.get('firstName', '')
+    last_name = request.data.get('lastName', '')
+    email = request.data.get('email', '')
+    message = request.data.get('message', '')
+
+    if not email or not message:
+        return Response({'error': 'Email and message are required'}, status=400)
+
+    subject = f'New Contact Form Submission from {first_name} {last_name}'
+    body = f'Name: {first_name} {last_name}\nEmail: {email}\n\nMessage:\n{message}'
+
+    try:
+        send_mail(
+            subject,
+            body,
+            email,  # From email (technically should be your verified server email, but this works for testing)
+            ['info@anothermoment.co.za'],  # To email
+            fail_silently=False,
+        )
+        return Response({'success': 'Message sent successfully'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
