@@ -44,8 +44,9 @@ def create_checkout(request):
     import json
     import urllib.request
     
-    # In production, replace with your actual Yoco Secret Key from environment variables
-    YOCO_SECRET_KEY = "sk_test_45bc50000eD08xge47f4626a3b47"
+    from django.conf import settings
+    # Read Yoco Secret Key from Django settings
+    YOCO_SECRET_KEY = settings.YOCO_SECRET_KEY
     
     amount = request.data.get('amount', 4900)
     currency = request.data.get('currency', 'ZAR')
