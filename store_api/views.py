@@ -171,7 +171,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 )
                 uploaded_main.append(optimized_url)
             except Exception as e:
-                return Response({'error': str(e)}, status=400)
+                return Response({'error': f'First Image "{f.name}" error: {str(e)}'}, status=400)
             
         uploaded_extra = []
         for f in extra_images:
@@ -185,7 +185,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 )
                 uploaded_extra.append(optimized_url)
             except Exception as e:
-                return Response({'error': str(e)}, status=400)
+                return Response({'error': f'Feature Image "{f.name}" error: {str(e)}'}, status=400)
             
         return Response({
             'main_images': uploaded_main,
