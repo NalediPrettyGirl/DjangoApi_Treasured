@@ -23,6 +23,9 @@ def register_user(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name,
+            "surname": user.last_name,
+            "email": user.email,
+            "whatsapp": getattr(user, 'whatsapp', ''),
             "token": token.key
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -37,6 +40,9 @@ def login_user(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name,
+            "surname": user.last_name,
+            "email": user.email,
+            "whatsapp": getattr(user, 'whatsapp', ''),
             "token": token.key
         }, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
@@ -115,6 +121,9 @@ def google_login(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name,
+            "surname": user.last_name,
+            "email": user.email,
+            "whatsapp": getattr(user, 'whatsapp', ''),
             "token": auth_token.key
         }, status=status.HTTP_200_OK)
         
