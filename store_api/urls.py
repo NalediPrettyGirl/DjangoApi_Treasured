@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     register_user, login_user, create_checkout, UserViewSet,
     CategoryViewSet, ProductViewSet, OrderViewSet, ChatViewSet,
-    contact_message
+    contact_message, google_login
 )
 
 router = DefaultRouter(trailing_slash=False)
@@ -16,6 +16,7 @@ router.register(r'chats', ChatViewSet, basename='chat')
 urlpatterns = [
     path('users/register', register_user, name='register'),
     path('users/login', login_user, name='login'),
+    path('users/google-login', google_login, name='google_login'),
     path('checkout/create', create_checkout, name='create_checkout'),
     path('contact', contact_message, name='contact'),
     # ViewSets

@@ -8,6 +8,9 @@ from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer,
     CategorySerializer, ProductSerializer, OrderSerializer, ChatSerializer
 )
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from django.conf import settings
 
 # Authentication Views
 @api_view(['POST'])
@@ -78,6 +81,46 @@ def create_checkout(request):
             return Response({"error": "Yoco Payment Error", "details": error_data}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def google_login(request):
+    token = request.data.get('token')
+    if not token:
+        return Response({'error': 'No token provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Specify the CLIENT_ID of the app that accesses the backend:
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), settings.GOOGLE_CLIENT_ID)
+        
+        email = idinfo['email']
+        first_name = idinfo.get('given_name', '')
+        last_name = idinfo.get('family_name', '')
+        
+        # Check if user exists
+        user = User.objects.filter(username=email).first()
+        if not user:
+            # Create user if not exists
+            user = User.objects.create(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+            user.set_unusable_password()
+            user.save()
+            
+        auth_token, _ = Token.objects.get_or_create(user=user)
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "name": user.first_name,
+            "token": auth_token.key
+        }, status=status.HTTP_200_OK)
+        
+    except ValueError:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 # User ViewSet
 class UserViewSet(viewsets.ModelViewSet):
