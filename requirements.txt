@@ -9,3 +9,5 @@ gunicorn
 dj-database-url
 whitenoise
 cloudinary
+google-auth
+requests
